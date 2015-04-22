@@ -5,6 +5,9 @@
 qsub -l mem_free=64G -l h_vmem=64G -cwd -b y 'R CMD BATCH "--args cases.rawcnv" /mydir/penn2temp.R'
 qsub -l mem_free=64G -l h_vmem=64G -cwd -b y 'R CMD BATCH "--args controls.rawcnv" /mydir/penn2temp.R'
 
+# split map file
+qsub -l mem_free=64G -l h_vmem=64G -cwd -b y 'R CMD BATCH /mydir/split_map.R'
+
 # perform statistics and gwas-like Manhattan visualisation
 qsub -l mem_free=64G -l h_vmem=64G -cwd -b y 'R CMD BATCH "--args 1" /mydir/temp2man.R'
 qsub -l mem_free=64G -l h_vmem=64G -cwd -b y 'R CMD BATCH "--args 2" /mydir/temp2man.R'
