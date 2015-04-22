@@ -1,8 +1,8 @@
 args <- commandArgs(trailingOnly = TRUE)
 
 # import data
-cases <- read.table("/mydir/penn-cases.txt", header = T, sep = " ", stringsAsFactors = F)
-controls <- read.table("/mydir/penn-controls.txt", header = T, sep = " ", stringsAsFactors = F)
+cases <- read.table("/mydir/cases.rawcnv", header = T, sep = " ", stringsAsFactors = F)
+controls <- read.table("/mydir/controls.rawcnv", header = T, sep = " ", stringsAsFactors = F)
 fam <- read.table("/mydir/plink.fam", header = F, sep = "\t", stringsAsFactors = F)
 out <- read.table(paste("/mydir/chr/chr", args[[1]], "_template.txt", sep = ""), header = T, sep = "\t", stringsAsFactors = F)
 
