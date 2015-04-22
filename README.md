@@ -1,2 +1,1 @@
-# pennCNV2manhattan
-readme
+# Transform PennCNV output to Manhattan plots
