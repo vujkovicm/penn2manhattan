@@ -1,0 +1,39 @@
+args<-commandArgs(trailingOnly = TRUE)
+
+# import .rawcnv file from penncnv
+
+# in/output directories
+dir <- read.table("/mnt/isilon/aplenc/code/cnv/makiCNV/dir.txt", F)
+
+# required files
+infile <- paste(dir[1, 1], args[[1]], sep = "/")
+outfile<- paste(dir[2, 1], args[[1]], sep = "/")
+
+# import .rawcnv
+df <- read.table(infile, F)
+
+# sample identifier
+colnames(df)[5] <- "regno"
+
+# find and replace strings
+df$size <- gsub("numsnp=", "", df$V2)
+df$length <- gsub("length=", "", df$V3)
+df$startsnp <- gsub("startsnp=", "", df$V6)
+df$endsnp <- gsub("endsnp=", "", df$V7)
+df$conf <- gsub("conf=", "", df$V8)
+
+# split strings
+df$chr <- as.character(lapply(strsplit(as.character(df$V1), split = ":"), "[", 1))
+df$chr <- gsub("chr", "", df$chr)
+df$bp <- as.character(lapply(strsplit(as.character(df$V1), split = ":"), "[", 2))
+df$start <- as.character(lapply(strsplit(as.character(df$bp), split = "-"), "[", 1))
+df$end <- as.character(lapply(strsplit(as.character(df$bp), split = "-"), "[", 2))
+
+df$state <- as.character(lapply(strsplit(as.character(df$V4), split = ","), "[", 1))
+df$state <- gsub("state", "", df$state)
+df$value <- as.character(lapply(strsplit(as.character(df$V4), split = ","), "[", 2))
+df$value <- gsub("cn=", "", df$value)
+
+# save to new format
+out <- df[ , c("regno", "chr", "start", "end", "size", "value")]
+write.table(out, outfile, row.names = F, col.names = T, quote = F)
