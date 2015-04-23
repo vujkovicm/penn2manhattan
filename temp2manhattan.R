@@ -15,20 +15,12 @@ colnames(out)[1] <- "CHR"
 colnames(out)[2] <- "BP" 
 colnames(out)[3] <- "SNP"
 
-# create output cols
-out$Xp.loss <- 0 ;
-out$Xp.gain <- 0 ;
-out$Fp.loss <- 0 ;
-out$Fp.gain <- 0 ;
-out$LossCase <- 0 ;
-out$LossControl <- 0 ;
-out$GainCase <- 0 ;
-out$GainControl <- 0 ;
+#create output cols
+out$LossCase <- out$GainCase <- out$LossControl <- out$GainControl <- 0 ;
 
 # counting cases
 for (i in 1:dim(cases)[1])
 {
-  # first select the correct chromosome for internal count revision
   if(cases$value[i] < 2 )
   {
     out[which(out$BP == cases$start[i]) : which(out$BP == cases$end[i]), "LossCase"] <- out[which(out$BP == cases$start[i]) : which(out$BP == cases$end[i]), "LossCase"] + 1 ;
@@ -37,7 +29,6 @@ for (i in 1:dim(cases)[1])
   {
     out[which(out$BP == cases$start[i]) : which(out$BP == cases$end[i]), "GainCase"] <- out[which(out$BP == cases$start[i]) : which(out$BP == cases$end[i]), "GainCase"] + 1 ;
   }
-  # save new internal count to external data frame
 }
 
 # counting controls
@@ -53,13 +44,26 @@ for (i in 1:dim(controls)[1])
   }
 }
 
-# Chi-X + Fisher's Exact
-for (j in 1:dim(out)[1])
+# counting counterfactuals and summaries
+for (i in 1:dim(out)[1])
 {
-  out$Xp.loss[j] <-  chisq.test(rbind(c(out$LossCase[j], table(fam$V6)[[2]] - out$LossCase[j]), c(out$LossControl[j], table(fam$V6)[[1]] - out$LossControl[j])))$p.value ;
-  out$Xp.gain[j] <-  chisq.test(rbind(c(out$GainCase[j], table(fam$V6)[[2]] - out$GainCase[j]), c(out$GainControl[j], table(fam$V6)[[1]] - out$GainControl[j])))$p.value ;
-  out$Fp.loss[j] <- fisher.test(rbind(c(out$LossCase[j], table(fam$V6)[[2]] - out$LossCase[j]), c(out$LossControl[j], table(fam$V6)[[1]] - out$LossControl[j])))$p.value ;
-  out$Fp.gain[j] <- fisher.test(rbind(c(out$GainCase[j], table(fam$V6)[[2]] - out$GainCase[j]), c(out$GainControl[j], table(fam$V6)[[1]] - out$GainControl[j])))$p.value ;
+  out$NoLossCase[i]      <- table(fam$V6)[[2]] - out$LossCase[i]    ;
+  out$NoLossControl[i]   <- table(fam$V6)[[1]] - out$LossControl[i] ;
+  out$NoGainCase[i]      <- table(fam$V6)[[2]] - out$GainCase[i]    ;
+  out$NoGainControl[i]   <- table(fam$V6)[[1]] - out$GainControl[i] ;
+  out$PercentLossCase    <- out$LossCase[i]    / table(fam$V6)[[2]] ;
+  out$PercentLossControl <- out$LossControl[i] / table(fam$V6)[[1]] ;
+  out$PercentGainCase    <- out$GainCase[i]    / table(fam$V6)[[2]] ;
+  out$PercentGainControl <- out$GainControl[i] / table(fam$V6)[[1]] ;
+}
+
+# Chi-X + Fisher's Exact
+for (i in 1:dim(out)[1])
+{
+  out$Xp.loss[i] <-  chisq.test(rbind(c(out$LossCase[i], out$NoLossCase[i]), c(out$LossControl[i], out$NoLossControl[i])))$p.value ;
+  out$Xp.gain[i] <-  chisq.test(rbind(c(out$GainCase[i], out$NoGainCase[i]), c(out$GainControl[i], out$NoGainControl[i])))$p.value ;
+  out$Fp.loss[i] <- fisher.test(rbind(c(out$LossCase[i], out$NoLossCase[i]), c(out$LossControl[i], out$NoLossControl[i])))$p.value ;
+  out$Fp.gain[i] <- fisher.test(rbind(c(out$GainCase[i], out$NoGainCase[i]), c(out$GainControl[i], out$NoGainControl[i])))$p.value ;
 }
 
 # Manhattan plot
