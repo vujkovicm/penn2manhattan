@@ -51,10 +51,6 @@ for (i in 1:dim(out)[1])
   out$NoLossControl[i]   <- table(fam$V6)[[1]] - out$LossControl[i] ;
   out$NoGainCase[i]      <- table(fam$V6)[[2]] - out$GainCase[i]    ;
   out$NoGainControl[i]   <- table(fam$V6)[[1]] - out$GainControl[i] ;
-  out$PercentLossCase    <- out$LossCase[i]    / table(fam$V6)[[2]] ;
-  out$PercentLossControl <- out$LossControl[i] / table(fam$V6)[[1]] ;
-  out$PercentGainCase    <- out$GainCase[i]    / table(fam$V6)[[2]] ;
-  out$PercentGainControl <- out$GainControl[i] / table(fam$V6)[[1]] ;
 }
 
 # Chi-X + Fisher's Exact
